@@ -1,0 +1,9 @@
+---
+
+- hosts: localhost
+  become: true
+  # vars_prompt:
+  #     - name: "ssh_passphrase"
+  #       prompt: "Enter the passphrase for the SSH key"
+  roles:
+    - common

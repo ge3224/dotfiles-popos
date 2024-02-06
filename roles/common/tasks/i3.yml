@@ -1,0 +1,23 @@
+# Determine if a path exists and is a directory.
+- name: Get stats of ~/.config/i3
+  ansible.builtin.stat:
+    path: /home/{{ username }}/.config/i3
+  register: p
+
+- name: Remove any kitty config that is not a symlink
+  ansible.builtin.file:
+    path: /home/{{ username }}/.config/i3
+    state: absent
+  when: p.stat.isdir is defined and p.stat.isdir
+
+- name: Unlink kitty config if it's a symlink
+  file:
+    path: /home/{{ username }}/.config/i3
+    state: absent
+  when: p.stat.exists and p.stat.islnk
+
+- name: Creating a symlink from repo `i3` to `~/.config`
+  ansible.builtin.file:
+    src: /home/{{ username }}/Projects/dotfiles-popos/main/roles/common/files/home/i3/
+    dest: /home/{{ username }}/.config/i3
+    state: link
