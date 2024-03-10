@@ -1,0 +1,63 @@
+# Screen Brightness
+
+- name: Install light utility
+  package:
+    name: light
+    state: present
+
+- name: Configure sudoers file
+  lineinfile:
+    path: /etc/sudoers
+    line: "{{ username }} ALL=(ALL) NOPASSWD: /usr/bin/light"
+    validate: 'visudo -cf %s'
+  when: username != "root"
+          
+# i3 Window Manager
+
+- name: Get stat of ~/.config/i3
+  ansible.builtin.stat:
+    path: /home/{{ username }}/.config/i3
+  register: i3_stat
+
+- name: Remove any i3 config that is not a symlink
+  ansible.builtin.file:
+    path: /home/{{ username }}/.config/i3
+    state: absent
+  when: i3_stat.stat.isdir is defined and i3_stat.stat.isdir
+
+- name: Unlink i3 config if it's a symlink
+  file:
+    path: /home/{{ username }}/.config/i3
+    state: absent
+  when: i3_stat.stat.exists and i3_stat.stat.islnk
+
+- name: Creating a symlink from repo `i3` to `~/.config`
+  ansible.builtin.file:
+    src: /home/{{ username }}/Projects/dotfiles-popos/main/common/files/home/i3/.config/i3
+    dest: /home/{{ username }}/.config/i3
+    state: link
+
+# i3 Status Bar
+
+- name: Get stat of ~/.config/i3status
+  ansible.builtin.stat:
+    path: /home/{{ username }}/.config/i3status
+  register: i3status_stat
+
+- name: Remove any i3status config that is not a symlink
+  ansible.builtin.file:
+    path: /home/{{ username }}/.config/i3status
+    state: absent
+  when: i3status_stat.stat.isdir is defined and i3status_stat.stat.isdir
+
+- name: Unlink i3status config if it's a symlink
+  file:
+    path: /home/{{ username }}/.config/i3status
+    state: absent
+  when: i3status_stat.stat.exists and i3status_stat.stat.islnk
+
+- name: Creating a symlink from repo `i3status` to `~/.config`
+  ansible.builtin.file:
+    src: /home/{{ username }}/Projects/dotfiles-popos/main/common/files/home/i3/.config/i3status
+    dest: /home/{{ username }}/.config/i3status
+    state: link

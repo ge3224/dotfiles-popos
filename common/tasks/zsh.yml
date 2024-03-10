@@ -25,6 +25,6 @@
 
 - name: Create symlink for .zshrc
   file:
-    src: /home/{{ username }}/Projects/dotfiles-popos/main/roles/common/files/home/zsh/.zshrc
+    src: /home/{{ username }}/Projects/dotfiles-popos/main/common/files/home/zsh/.zshrc
     dest: /home/{{ username }}/.zshrc
     state: link
