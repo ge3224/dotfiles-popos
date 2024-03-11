@@ -1,6 +1,6 @@
 #!/bin/zsh
 
-eval `gnome-keyring-daemon --start`
+# eval `gnome-keyring-daemon --start`
 
 key_chain="keychain"
 
