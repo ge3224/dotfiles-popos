@@ -1,5 +1,7 @@
 #!/bin/zsh
 
+eval `gnome-keyring-daemon --start`
+
 key_chain="keychain"
 
 if command -v $key_chain &> /dev/null; then
