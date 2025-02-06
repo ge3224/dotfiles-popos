@@ -1,0 +1,6 @@
+command = /usr/bin/zsh --login --interactive
+shell-integration = zsh
+
+font-size = 18
+window-decoration = false
+theme = kanagawabones

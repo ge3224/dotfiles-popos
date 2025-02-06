@@ -14,6 +14,6 @@
     autoremove: yes
 
 # - include_tasks: core.yml
-- include_tasks: kitty.yml
+- include_tasks: ghostty.yml
 - include_tasks: zsh.yml
 - include_tasks: i3.yml

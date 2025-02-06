@@ -1,0 +1,26 @@
+---
+
+# Determine if a path exists and is a directory.
+- name: Get stats of ~/.config/ghostty
+  ansible.builtin.stat:
+    path: /home/{{ username }}/.config/ghostty
+  register: p
+
+- name: Remove any ghostty config that is not a symlink
+  ansible.builtin.file:
+    path: /home/{{ username }}/.config/ghostty
+    state: absent
+  when: p.stat.isdir is defined and p.stat.isdir
+
+- name: Unlink ghostty config if it's a symlink
+  file:
+    path: /home/{{ username }}/.config/ghostty
+    state: absent
+  when: p.stat.exists and p.stat.islnk
+
+# Create a symlink
+- name: Creating a symlink from repo `ghostty` to `~/.config`
+  ansible.builtin.file:
+    src: /home/{{ username }}/Projects/dotfiles-popos/main/common/files/home/ghostty/config
+    dest: /home/{{ username }}/.config/ghostty
+    state: link
