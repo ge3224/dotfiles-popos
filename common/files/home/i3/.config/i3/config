@@ -48,7 +48,8 @@ floating_modifier $mod
 
 # start a terminal
 # bindsym $mod+Return exec alacritty
-bindsym $mod+Return exec kitty
+# bindsym $mod+Return exec kitty
+bindsym $mod+Return exec ghostty
 
 # kill focused window
 bindsym $mod+Shift+q kill
@@ -131,8 +132,8 @@ set $ws8 "8"
 set $ws9 "9"
 set $ws10 "10"
 
-workspace 1 output DP-2
-workspace 10 output primary
+workspace 10 output HDMI-2
+workspace 1 output primary
 
 # switch to workspace
 bindsym $mod+1 workspace number $ws1 
@@ -221,7 +222,7 @@ exec --no-startup-id xmodmap -e "remove Lock = Caps_Lock" -display :1
 exec --no-startup-id xmodmap -e "keycode 0x42 = Escape" -display :1
 exec --no-startup-id xmodmap -e "add Lock = Caps_Lock" -display :1
 
-# Control volume via pulseaudio
+# Control volume via pulseaudio 
 bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ -5%
 bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ +5%
 bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute @DEFAULT_SINK@ toggle
@@ -232,3 +233,9 @@ bindsym XF86MonBrightnessDown exec sudo light -U 10
 
 # Define keybinding for toggling mute/unmute
 bindsym XF86AudioMicMute exec --no-startup-id pactl set-source-mute @DEFAULT_SOURCE@ toggle
+
+# Laptop Screen (eDP-1) on the left
+exec --no-startup-id xrandr --output eDP-1 --primary --pos 0x0
+
+# External Monitor (HDMI-2) to the right of the laptop screen
+exec --no-startup-id xrandr --output HDMI-2 --pos 1920x0 --mode 3840x2160 --dpi 144
