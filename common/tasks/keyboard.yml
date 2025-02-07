@@ -1,0 +1,36 @@
+---
+
+- name: Check if 00-keyboard.conf exists
+  stat:
+    path: /etc/X11/xorg.conf.d/00-keyboard.conf
+  register: keyboard_conf_stat
+
+- name: Create 00-keyboard.conf if it doesn't exist
+  copy: # Use copy module to create the file
+    content: "" # Empty content, as it's a new file
+    dest: /etc/X11/xorg.conf.d/00-keyboard.conf
+    mode: 0644 # Set appropriate permissions
+  when: not keyboard_conf_stat.stat.exists
+
+- name: Switch CapsLock to Esc
+  become: yes
+  replace:
+    path: /etc/X11/xorg.conf.d/00-keyboard.conf
+    regexp: '"terminate:ctrl_alt_bksp"$'
+    replace: '"terminate:ctrl_alt_bksp,caps:escape_shifted_capslock"'
+  # Add a when clause to only run replace if the file exists (optional, but good practice):
+  when: keyboard_conf_stat.stat.exists or not keyboard_conf_stat.stat.exists # Always run, since we create it if it doesn't exist
+
+# Alternative using blockinfile for new file creation and content insertion (more flexible):
+- name: Ensure CapsLock is mapped to Esc (using blockinfile)
+  become: yes
+  blockinfile:
+    path: /etc/X11/xorg.conf.d/00-keyboard.conf
+    create: yes # creates the file if it doesn't exist
+    block: |
+      Section "InputClass"
+          Identifier "system-keyboard"
+          MatchIsKeyboard "on"
+          Option "XkbLayout" "us" # Or your preferred layout
+          Option "XkbOptions" "terminate:ctrl_alt_bksp,caps:escape_shifted_capslock"
+      EndSection
