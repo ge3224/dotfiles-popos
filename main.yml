@@ -1,9 +1,27 @@
 ---
 
-- hosts: localhost
-  become: true
-  # vars_prompt:
-  #     - name: "ssh_passphrase"
-  #       prompt: "Enter the passphrase for the SSH key"
-  roles:
-    - common
+- name: pop-os-workstation
+  hosts: hosts
+  connection: local
+  # become: true
+  gather_facts: false
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  vars_prompt:
+    - name: username
+      prompt: What is your username?
+      private: no
+    - name: ansible_become_password
+      prompt: Enter sudo password
+      private: yes
+  tasks:
+    # - name: update apt packages 
+    #   include_tasks: tasks/apt.yml
+    # - name: configure keyboard
+    #   include_tasks: tasks/keyboard.yml
+    # - name: symlink i3 configs
+    #   include_tasks: tasks/i3.yml
+    # - name: symlink zsh config
+    #   include_tasks: tasks/zsh.yml
+    - name: set up ghostty terminal emulator
+      include_tasks: tasks/ghostty.yml

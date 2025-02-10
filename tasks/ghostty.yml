@@ -1,0 +1,67 @@
+---
+
+- name: Install latest glibc
+  apt:
+    name: 
+      - libc6
+      - libc-bin
+    state: latest
+    update_cache: true
+  become: true
+
+- name: Get latest Ghostty release
+  ansible.builtin.uri:
+    url: "https://api.github.com/repos/mkasberg/ghostty-ubuntu/releases/latest"
+    return_content: true
+  register: ghostty_release
+
+- name: Download Ghostty .deb package
+  ansible.builtin.get_url:
+    url: "{{ ghostty_release.json.assets[0].browser_download_url }}"
+    dest: "/tmp/ghostty.deb"
+    mode: '0644'
+
+- name: Install Ghostty using dpkg
+  shell: 
+    cmd: "dpkg -i /tmp/ghostty.deb"
+  become: true
+
+- name: Fix any missing dependencies
+  shell:
+    cmd: "apt install -f -y"
+  become: true
+
+# - name: Install Ghostty package
+#   apt:
+#     deb: "/tmp/ghostty.deb"
+#     state: present
+#     install_recommends: true
+#   become: true
+
+- name: Clean up downloaded package
+  file:
+    path: "/tmp/ghostty.deb"
+    state: absent
+
+# - name: Get stats on ghostty config
+#   ansible.builtin.stat:
+#     path: /home/{{ username }}/.config/ghostty
+#   register: p
+#
+# - name: check if ghostty config that is not a symlink
+#   ansible.builtin.file:
+#     path: /home/{{ username }}/.config/ghostty
+#     state: absent
+#   when: p.stat.isdir is defined and p.stat.isdir
+#
+# - name: Unlink ghostty config if nota a symlink
+#   file:
+#     path: /home/{{ username }}/.config/ghostty
+#     state: absent
+#   when: p.stat.exists and p.stat.islnk
+#
+# - name: Creating a symlink from to ghostty config
+#   ansible.builtin.file:
+#     src: "{{ playbook_dir }}/dotfiles/ghostty"
+#     dest: /home/{{ username }}/.config/ghostty
+#     state: link

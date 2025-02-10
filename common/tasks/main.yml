@@ -14,8 +14,8 @@
     autoremove: yes
 
 # - include_tasks: pop.yml
-- include_tasks: keyboard.yml
+# - include_tasks: keyboard.yml
 - include_tasks: ghostty.yml
-- include_tasks: zsh.yml
-- include_tasks: i3.yml
-- include_tasks: zen.yml
+# - include_tasks: zsh.yml
+# - include_tasks: i3.yml
+# - include_tasks: zen.yml

@@ -1,0 +1,54 @@
+---
+# https://github.com/zen-browser/desktop/releases
+
+- name: Get latest Zen release tag
+  uri:
+    url: "https://api.github.com/repos/zen-browser/desktop/releases/latest"
+    return_content: yes
+  register: zen_release
+
+- set_fact:
+    zen_version: "{{ zen_release.json.tag_name | regex_replace('^v', '') }}"
+
+- name: Construct Zen download URL
+  set_fact:
+    zen_download_url: "{{ zen_release.json.assets | json_query('[?contains(name, ''x86_64'') && name like ''*.AppImage''].browser_download_url') | first }}"
+    # zen_download_url: "{{ zen_release.json.assets | json_query('[?name like ''*x86_64*.AppImage''].browser_download_url') | first }}"  # Use json_query
+    # zen_download_url: "https://github.com/user/repo/releases/download/v{{ zen_version }}/zen-x86_64.AppImage" # Adjust architecture
+
+- name: Check if Zen AppImage exists
+  stat:
+    path: "{{ ansible_user_dir }}/.local/bin/zen.AppImage"
+  register: zen_appimage_stat
+
+- name: Get current version of Zen (if exists)
+  shell: "strings {{ ansible_user_dir }}/.local/bin/zen.AppImage | grep 'Version:' | cut -d: -f2 | xargs"
+  register: current_zen_version
+  when: zen_appimage_stat.stat.exists
+
+- name: Skip download if version matches
+  debug:
+    msg: "Zen is already up-to-date (v{{ zen_version }})"
+  when: zen_appimage_stat.stat.exists and current_zen_version.stdout == zen_version
+
+- name: Download Zen AppImage
+  get_url:
+    url: "{{ zen_download_url }}"
+    dest: "{{ ansible_user_dir }}/.local/bin/zen.AppImage"
+    mode: 0755
+  when: not zen_appimage_stat.stat.exists or current_zen_version.stdout != zen_version
+
+- name: Integrate with desktop (appimagelauncher)
+  # You can use the appimagelauncher package directly or manually create desktop entries
+  # Example (requires appimagelauncher package):
+  # command: appimagelauncher "{{ ansible_user_dir }}/.local/bin/zen.AppImage"
+  # Or create the desktop entry manually
+  # ...
+
+- name: Set PATH (if needed) - add to your .bashrc/.zshrc
+  blockinfile:
+    path: "{{ ansible_user_dir }}/.bashrc" # Or .zshrc
+    block: |
+      export PATH="$HOME/.local/bin:$PATH"
+    create: yes
+  when: not zen_appimage_stat.stat.exists or current_zen_version.stdout != zen_version
